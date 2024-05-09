@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -126,7 +125,6 @@ private fun ShizukuCard() {
                 Column(Modifier.padding(start = 20.dp)) {
                     Text(
                         text = stringResource(R.string.shizuku_available),
-                        fontFamily = FontFamily.Serif,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(Modifier.height(4.dp))
@@ -140,7 +138,6 @@ private fun ShizukuCard() {
                 Column(Modifier.padding(start = 20.dp)) {
                     Text(
                         text = stringResource(R.string.shizuku_unavailable),
-                        fontFamily = FontFamily.Serif,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(Modifier.height(4.dp))
