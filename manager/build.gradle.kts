@@ -10,6 +10,7 @@ plugins {
     alias(lspatch.plugins.google.devtools.ksp)
     alias(lspatch.plugins.rikka.tools.refine)
     alias(lspatch.plugins.kotlin.android)
+    alias(lspatch.plugins.compose.compiler)
     id("kotlin-parcelize")
     kotlin("kapt")
     alias(lspatch.plugins.googleHiltAndroid)
@@ -52,10 +53,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     namespace = "org.lsposed.lspatch"

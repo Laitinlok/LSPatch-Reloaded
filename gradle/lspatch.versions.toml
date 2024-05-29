@@ -6,8 +6,8 @@ shizuku = "13.1.2"
 hiddenapi-refine = "4.3.0"
 hiddenapi-stub = "4.2.0"
 compose-bom = "2024.05.00"
-kotlin = "1.9.24"
-ksp = "1.9.24-1.0.20"
+kotlin = "2.0.0"
+ksp = "2.0.0-1.0.21"
 commons-io = "2.13.0"
 beust-jcommander = "1.82"
 google-gson = "2.10.1"
@@ -16,6 +16,7 @@ google-gson = "2.10.1"
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 rikka-tools-refine = { id = "dev.rikka.tools.refine", version.ref = "hiddenapi-refine" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 googleHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [libraries]
