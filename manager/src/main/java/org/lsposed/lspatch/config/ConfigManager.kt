@@ -1,28 +1,30 @@
 package org.lsposed.lspatch.config
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.room.Room
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import org.lsposed.lspatch.database.LSPDatabase
 import org.lsposed.lspatch.database.entity.Module
 import org.lsposed.lspatch.database.entity.Scope
-import org.lsposed.lspatch.lspApp
 import org.lsposed.lspatch.util.ModuleLoader
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ConfigManager {
+private const val TAG = "ConfigManager"
 
-    private const val TAG = "ConfigManager"
-
+@Singleton
+class ConfigManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    db: LSPDatabase
+) {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = Dispatchers.Default.limitedParallelism(1)
-
-    private val db: LSPDatabase = Room.databaseBuilder(
-        lspApp, LSPDatabase::class.java, "modules_config.db"
-    ).build()
 
     private val moduleDao = db.moduleDao()
     private val scopeDao = db.scopeDao()
@@ -68,7 +70,7 @@ object ConfigManager {
                 if (!File(it.apkPath).exists()) {
                     loadedModules.remove(it)
                     try {
-                        it.apkPath = lspApp.packageManager.getApplicationInfo(it.pkgName, 0).sourceDir
+                        it.apkPath = context.packageManager.getApplicationInfo(it.pkgName, 0).sourceDir
                     } catch (e: PackageManager.NameNotFoundException) {
                         moduleDao.delete(moduleDao.getModule(it.pkgName))
                         Log.w(TAG, "Module may be uninstalled: ${it.pkgName}")

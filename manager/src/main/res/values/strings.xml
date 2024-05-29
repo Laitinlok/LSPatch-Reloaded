@@ -15,6 +15,7 @@
     <string name="error_unknown">Unknown error</string>
 
     <!-- Home Screen -->
+    <string name="screen_home">Home</string>
     <string name="home_shizuku_warning">Some functions unavailable</string>
     <string name="home_api_version">API Version</string>
     <string name="home_lspatch_version">LSPatch Version</string>
@@ -52,16 +53,16 @@
     <string name="patch_from_storage">Select apk(s) from storage</string>
     <string name="patch_from_applist">Select an installed app</string>
     <string name="patch_mode">Patch Mode</string>
-    <string name="patch_local">Local</string>
+    <string name="patch_local">Local mode</string>
     <string name="patch_local_desc">Patch an app without modules embedded.\nXposed scope can be changed dynamically without re-patch.\nLocal patched apps can only run on the local device.</string>
-    <string name="patch_integrated">Integrated</string>
+    <string name="patch_integrated">Integrated mode</string>
     <string name="patch_integrated_desc">Patch an app with modules embedded.\nThe patched app can run without the manager, but cannot be managed dynamically.\nIntegrated patched apps can be used on devices that do not have LSPatch Manager installed.</string>
     <string name="patch_embed_modules">Embed modules</string>
     <string name="patch_debuggable">Debuggable</string>
     <string name="patch_sigbypass">Signature bypass</string>
-    <string name="patch_sigbypasslv0">lv0: Off</string>
-    <string name="patch_sigbypasslv1">lv1: Bypass PM</string>
-    <string name="patch_sigbypasslv2">lv2: Bypass PM + openat (libc)</string>
+    <string name="patch_sigbypasslv0">Level 0: Disabled</string>
+    <string name="patch_sigbypasslv1">Level 1: Bypass PM</string>
+    <string name="patch_sigbypasslv2">Level 2: Bypass PM + openat (libc)</string>
     <string name="patch_override_version_code">Override version code</string>
     <string name="patch_override_version_code_desc">Override the patched app\'s version code to 1\nThis allows downgrade installation in the future, and generally this will not affect the version code actually perceived by the application</string>
     <string name="patch_start">Start Patch</string>

@@ -5,11 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.lsposed.lspatch.lspApp
 import org.lsposed.lspatch.util.LSPPackageManager
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AppBroadcastReceiver : BroadcastReceiver() {
+    private val scope = CoroutineScope(Dispatchers.Default)
+    @Inject lateinit var lspPackageManager: LSPPackageManager
 
     companion object {
         private const val TAG = "AppBroadcastReceiver"
@@ -31,9 +37,9 @@ class AppBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action in actions) {
-            lspApp.globalScope.launch {
+            scope.launch {
                 Log.i(TAG, "Received intent: $intent")
-                LSPPackageManager.fetchAppList()
+                lspPackageManager.fetchAppList()
             }
         }
     }

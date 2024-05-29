@@ -1,17 +1,24 @@
 package org.lsposed.lspatch.config
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.lsposed.lspatch.lspApp
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object MyKeyStore {
+@Singleton
+class MyKeyStore @Inject constructor(
+    @ApplicationContext context: Context,
+    private val configs: Configs
+) {
 
-    val file = File("${lspApp.filesDir}/keystore.bks")
-    val tmpFile = File("${lspApp.filesDir}/keystore.bks.tmp")
+    val file = File("${context.filesDir}/keystore.bks")
+    val tmpFile = File("${context.filesDir}/keystore.bks.tmp")
 
     var useDefault by mutableStateOf(!file.exists())
         private set
@@ -19,9 +26,9 @@ object MyKeyStore {
     suspend fun reset() {
         withContext(Dispatchers.IO) {
             file.delete()
-            Configs.keyStorePassword = "123456"
-            Configs.keyStoreAlias = "key0"
-            Configs.keyStoreAliasPassword = "123456"
+            configs.keyStorePassword = "123456"
+            configs.keyStoreAlias = "key0"
+            configs.keyStoreAliasPassword = "123456"
             useDefault = true
         }
     }
@@ -29,9 +36,9 @@ object MyKeyStore {
     suspend fun setCustom(password: String, alias: String, aliasPassword: String) {
         withContext(Dispatchers.IO) {
             tmpFile.renameTo(file)
-            Configs.keyStorePassword = password
-            Configs.keyStoreAlias = alias
-            Configs.keyStoreAliasPassword = aliasPassword
+            configs.keyStorePassword = password
+            configs.keyStoreAlias = alias
+            configs.keyStoreAliasPassword = aliasPassword
             useDefault = false
         }
     }

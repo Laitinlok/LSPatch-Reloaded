@@ -1,4 +1,4 @@
-package org.lsposed.lspatch.ui.page
+package org.lsposed.lspatch.ui.page.settings
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ramcosta.composedestinations.annotation.Destination
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import org.lsposed.lspatch.R
 import org.lsposed.lspatch.config.Configs
@@ -32,14 +32,16 @@ import org.lsposed.lspatch.ui.component.AnywhereDropdown
 import org.lsposed.lspatch.ui.component.CenterTopBar
 import org.lsposed.lspatch.ui.component.settings.SettingsItem
 import org.lsposed.lspatch.ui.component.settings.SettingsSwitch
+import org.lsposed.lspatch.ui.page.BottomBarDestination
+import java.io.File
 import java.io.IOException
 import java.security.GeneralSecurityException
 import java.security.KeyStore
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Destination
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
     Scaffold(
         topBar = { CenterTopBar(stringResource(BottomBarDestination.Settings.label)) }
     ) { innerPadding ->
@@ -48,15 +50,24 @@ fun SettingsScreen() {
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            KeyStore()
-            DetailPatchLogs()
+            KeyStore(
+                useDefault = viewModel.useDefaultKeyStore,
+                onReset = viewModel::resetKeyStore,
+                tmpFile = viewModel.tmpFileKeyStore,
+                onSetCustom = viewModel::setCustomKeyStore
+            )
+            DetailPatchLogs(viewModel.configs)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun KeyStore() {
+private fun KeyStore(
+    useDefault: Boolean,
+    onReset: suspend () -> Unit,
+    tmpFile: File,
+    onSetCustom: suspend (String, String, String) -> Unit
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
@@ -70,14 +81,14 @@ private fun KeyStore() {
             SettingsItem(
                 icon = Icons.Outlined.Ballot,
                 title = stringResource(R.string.settings_keystore),
-                desc = stringResource(if (MyKeyStore.useDefault) R.string.settings_keystore_default else R.string.settings_keystore_custom)
+                desc = stringResource(if (useDefault) R.string.settings_keystore_default else R.string.settings_keystore_custom)
             )
         }
     ) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.settings_keystore_default)) },
             onClick = {
-                scope.launch { MyKeyStore.reset() }
+                scope.launch { onReset() }
                 expanded = false
             }
         )
@@ -104,7 +115,7 @@ private fun KeyStore() {
         val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri == null) return@rememberLauncherForActivityResult
             context.contentResolver.openInputStream(uri).use { input ->
-                MyKeyStore.tmpFile.outputStream().use { output ->
+                tmpFile.outputStream().use { output ->
                     input?.copyTo(output)
                 }
             }
@@ -128,7 +139,7 @@ private fun KeyStore() {
                         }
                         val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
                         try {
-                            MyKeyStore.tmpFile.inputStream().use { input ->
+                            tmpFile.inputStream().use { input ->
                                 keyStore.load(input, password.toCharArray())
                             }
                         } catch (e: IOException) {
@@ -149,7 +160,7 @@ private fun KeyStore() {
                             return@TextButton
                         }
 
-                        scope.launch { MyKeyStore.setCustom(password, alias, aliasPassword) }
+                        scope.launch { onSetCustom(password, alias, aliasPassword) }
                         expanded = false
                         showDialog = false
                     })
@@ -232,10 +243,12 @@ private fun KeyStore() {
 }
 
 @Composable
-private fun DetailPatchLogs() {
+private fun DetailPatchLogs(
+    configs: Configs
+) {
     SettingsSwitch(
-        modifier = Modifier.clickable { Configs.detailPatchLogs = !Configs.detailPatchLogs },
-        checked = Configs.detailPatchLogs,
+        modifier = Modifier.clickable { configs.detailPatchLogs = !configs.detailPatchLogs },
+        checked = configs.detailPatchLogs,
         icon = Icons.Outlined.BugReport,
         title = stringResource(R.string.settings_detail_patch_logs)
     )

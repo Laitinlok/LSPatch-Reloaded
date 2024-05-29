@@ -1,28 +1,32 @@
-package org.lsposed.lspatch.ui.page
+package org.lsposed.lspatch.ui.page.home
 
-import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,45 +34,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.lsposed.lspatch.R
 import org.lsposed.lspatch.share.LSPConfig
 import org.lsposed.lspatch.ui.component.CenterTopBar
-import org.lsposed.lspatch.ui.page.destinations.ManageScreenDestination
-import org.lsposed.lspatch.ui.page.destinations.NewPatchScreenDestination
 import org.lsposed.lspatch.ui.util.HtmlText
 import org.lsposed.lspatch.ui.util.LocalSnackbarHost
 import org.lsposed.lspatch.util.ShizukuApi
 import rikka.shizuku.Shizuku
 
-@OptIn(ExperimentalMaterial3Api::class)
-@RootNavGraph(start = true)
-@Destination
 @Composable
-fun HomeScreen(navigator: DestinationsNavigator) {
-    // Install from intent
-    var isIntentLaunched by rememberSaveable { mutableStateOf(false) }
-    val activity = LocalContext.current as Activity
-    val intent = activity.intent
-    LaunchedEffect(Unit) {
-        if (!isIntentLaunched && intent.action == Intent.ACTION_VIEW && intent.hasCategory(Intent.CATEGORY_DEFAULT) && intent.type == "application/vnd.android.package-archive") {
-            isIntentLaunched = true
-            val uri = intent.data
-            if (uri != null) {
-                navigator.navigate(ManageScreenDestination)
-                navigator.navigate(
-                    NewPatchScreenDestination(
-                        id = ACTION_INTENT_INSTALL,
-                        data = uri
-                    )
-                )
-            }
-        }
-    }
-
+fun HomeScreen() {
     Scaffold(
         topBar = { CenterTopBar(stringResource(R.string.app_name)) }
     ) { innerPadding ->
@@ -91,23 +67,22 @@ private val listener: (Int, Int) -> Unit = { _, grantResult ->
     ShizukuApi.isPermissionGranted = grantResult == PackageManager.PERMISSION_GRANTED
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShizukuCard() {
-    LaunchedEffect(Unit) {
-        Shizuku.addRequestPermissionResultListener(listener)
-    }
     DisposableEffect(Unit) {
+        Shizuku.addRequestPermissionResultListener(listener)
         onDispose {
             Shizuku.removeRequestPermissionResultListener(listener)
         }
     }
 
     ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(containerColor = run {
-            if (ShizukuApi.isPermissionGranted) MaterialTheme.colorScheme.secondaryContainer
-            else MaterialTheme.colorScheme.errorContainer
-        })
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = if (ShizukuApi.isPermissionGranted)
+                MaterialTheme.colorScheme.secondaryContainer
+            else
+                MaterialTheme.colorScheme.errorContainer
+        )
     ) {
         Row(
             modifier = Modifier
@@ -158,14 +133,13 @@ private val apiVersion = if (Build.VERSION.PREVIEW_SDK_INT != 0) {
 }
 
 private val device = buildString {
-    append(Build.MANUFACTURER[0].uppercaseChar().toString() + Build.MANUFACTURER.substring(1))
+    append(Build.MANUFACTURER.replaceFirstChar { it.uppercaseChar() })
     if (Build.BRAND != Build.MANUFACTURER) {
-        append(" " + Build.BRAND[0].uppercaseChar() + Build.BRAND.substring(1))
+        append(" " + Build.BRAND.replaceFirstChar { it.uppercaseChar() })
     }
-    append(" " + Build.MODEL + " ")
+    append(" " + Build.MODEL)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InfoCard() {
     val context = LocalContext.current
@@ -205,7 +179,7 @@ private fun InfoCard() {
             TextButton(
                 modifier = Modifier.align(Alignment.End),
                 onClick = {
-                    val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val cm = context.getSystemService(ClipboardManager::class.java)
                     cm.setPrimaryClip(ClipData.newPlainText("LSPatch", contents.toString()))
                     scope.launch { snackbarHost.showSnackbar(copiedMessage) }
                 },
@@ -215,7 +189,6 @@ private fun InfoCard() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 private fun SupportCard() {

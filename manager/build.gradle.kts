@@ -1,5 +1,3 @@
-import java.util.Locale
-
 val defaultManagerPackageName: String by rootProject.extra
 val apiCode: Int by rootProject.extra
 val verCode: Int by rootProject.extra
@@ -13,6 +11,8 @@ plugins {
     alias(lspatch.plugins.rikka.tools.refine)
     alias(lspatch.plugins.kotlin.android)
     id("kotlin-parcelize")
+    kotlin("kapt")
+    alias(lspatch.plugins.googleHiltAndroid)
 }
 
 android {
@@ -55,7 +55,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     namespace = "org.lsposed.lspatch"
@@ -99,12 +99,17 @@ dependencies {
     implementation(projects.share.java)
     implementation(platform(lspatch.androidx.compose.bom))
 
+    implementation(lspatch.google.hilt.android)
+    kapt(lspatch.google.hilt.android.compiler)
+    implementation(lspatch.androidx.hilt.navigation.compose)
+
     annotationProcessor(lspatch.androidx.room.compiler)
     compileOnly(lspatch.rikka.hidden.stub)
     debugImplementation(lspatch.androidx.compose.ui.tooling)
     debugImplementation(lspatch.androidx.customview)
     debugImplementation(lspatch.androidx.customview.poolingcontainer)
     implementation(lspatch.androidx.activity.compose)
+    implementation(lspatch.androidx.compose.material)
     implementation(lspatch.androidx.compose.material.icons.extended)
     implementation(lspatch.androidx.compose.material3)
     implementation(lspatch.androidx.compose.ui)
@@ -115,17 +120,16 @@ dependencies {
     implementation(libs.androidx.preference)
     implementation(lspatch.androidx.room.ktx)
     implementation(lspatch.androidx.room.runtime)
-    implementation(lspatch.google.accompanist.navigation.animation)
-    implementation(lspatch.google.accompanist.pager)
-    implementation(lspatch.google.accompanist.swiperefresh)
     implementation(libs.material)
     implementation(libs.gson)
     implementation(lspatch.rikka.shizuku.api)
     implementation(lspatch.rikka.shizuku.provider)
     implementation(lspatch.rikka.refine)
-    implementation(lspatch.raamcosta.compose.destinations)
     implementation(libs.appiconloader)
-    implementation(libs.hiddenapibypass)
     ksp(lspatch.androidx.room.compiler)
-    ksp(lspatch.raamcosta.compose.destinations.ksp)
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }

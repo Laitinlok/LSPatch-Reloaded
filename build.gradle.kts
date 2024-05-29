@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.agp.lib) apply false
     alias(libs.plugins.agp.app) apply false
     alias(lspatch.plugins.kotlin.android) apply false
+    alias(lspatch.plugins.google.devtools.ksp) apply false
+    alias(lspatch.plugins.googleHiltAndroid) apply false
 }
 
 buildscript {

@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,7 +40,7 @@ fun AppItem(
             .padding(20.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -74,16 +75,57 @@ fun AppItem(
 
 @Preview
 @Composable
-private fun AppItemPreview() {
+private fun AppItemPreviewRightIcon() {
     LSPTheme {
+        val density = LocalDensity.current
         val shape = GradientDrawable()
         shape.shape = GradientDrawable.RECTANGLE
         shape.setColor(MaterialTheme.colorScheme.primary.toArgb())
+        shape.setSize(with(density) { 48.dp.roundToPx() }, with(density) { 48.dp.roundToPx() })
         AppItem(
             icon = shape.toBitmap().asImageBitmap(),
             label = "Sample App",
             packageName = "org.lsposed.sample",
             rightIcon = { Icon(Icons.Filled.ArrowForwardIos, null) }
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AppItemPreviewChecked() {
+    LSPTheme {
+        val density = LocalDensity.current
+        val shape = GradientDrawable()
+        shape.shape = GradientDrawable.RECTANGLE
+        shape.setColor(MaterialTheme.colorScheme.primary.toArgb())
+        shape.setSize(with(density) { 48.dp.roundToPx() }, with(density) { 48.dp.roundToPx() })
+        AppItem(
+            icon = shape.toBitmap().asImageBitmap(),
+            label = "Sample App",
+            packageName = "org.lsposed.sample",
+            checked = true
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AppItemPreviewAdditionalContent() {
+    LSPTheme {
+        val density = LocalDensity.current
+        val shape = GradientDrawable()
+        shape.shape = GradientDrawable.RECTANGLE
+        shape.setColor(MaterialTheme.colorScheme.primary.toArgb())
+        shape.setSize(with(density) { 48.dp.roundToPx() }, with(density) { 48.dp.roundToPx() })
+        AppItem(
+            icon = shape.toBitmap().asImageBitmap(),
+            label = "Sample App",
+            packageName = "org.lsposed.sample",
+            checked = true,
+            additionalContent = {
+                Text("Additional content")
+            }
         )
     }
 }
